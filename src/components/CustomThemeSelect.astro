@@ -1,0 +1,76 @@
+---
+import Select from '@astrojs/starlight/components/Select.astro';
+import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
+
+const defaultPreference = 'both'; // Default to showing both texts during SSR
+---
+
+<starlight-text-toggle-select data-preference={defaultPreference}>
+    <div class="flex items-center gap-4">
+    <!-- Dropdown for Text Display Options -->
+    <Select
+      icon="globe"
+      label="Text Display Options"
+      value={defaultPreference}
+      options={[
+        { label: 'Bengali Only', value: 'bengali' },
+        { label: 'Transliteration Only', value: 'transliteration' },
+        { label: 'Both', value: 'both' },
+      ]}
+      width="10em"
+    />
+
+    <!-- Render the original ThemeSelect component below -->
+    <ThemeSelect {...Astro.props} />
+    </div>
+</starlight-text-toggle-select>
+
+<script>
+  class StarlightTextToggleSelect extends HTMLElement {
+    constructor() {
+      super();
+      const selectElement = this.querySelector('select');
+
+      // Apply saved preference on page load (client-side only)
+      this.applyStoredPreference();
+
+      // Listen for dropdown changes
+      selectElement?.addEventListener('change', (event) => {
+        const value = event.target.value;
+        this.onTextToggleChange(value);
+      });
+    }
+
+    applyStoredPreference() {
+      const savedPreference = localStorage.getItem('textDisplayPreference') || 'both';
+      this.onTextToggleChange(savedPreference);
+      const selectElement = this.querySelector('select');
+      if (selectElement) selectElement.value = savedPreference; // Set initial dropdown value
+    }
+
+    onTextToggleChange(value) {
+      const bengaliElements = document.querySelectorAll('.bengali-text');
+      const transliterationElements = document.querySelectorAll('.transliteration');
+
+      // Store the selected preference in localStorage
+      localStorage.setItem('textDisplayPreference', value);
+
+      console.log(value);
+
+      // Apply visibility based on the selected option
+      if (value === 'bengali') {
+        bengaliElements.forEach(el => el.style.display = 'block');
+        transliterationElements.forEach(el => el.style.display = 'none');
+      } else if (value === 'transliteration') {
+        bengaliElements.forEach(el => el.style.display = 'none');
+        transliterationElements.forEach(el => el.style.display = 'block');
+      } else {
+        bengaliElements.forEach(el => el.style.display = 'block');
+        transliterationElements.forEach(el => el.style.display = 'block');
+      }
+    }
+  }
+
+  // Define the custom element
+  customElements.define('starlight-text-toggle-select', StarlightTextToggleSelect);
+</script>

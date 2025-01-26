@@ -1,0 +1,88 @@
+---
+import ThemeSwitcher from '../components/ThemeSwitcher.astro';
+import BengaliText from './BengaliText.astro';
+import Transliteration from './Transliteration.astro';
+import GitHubIcon from '../assets/icons/github.svg';
+
+export interface Props {
+  currentBook?: { data: { title: { bn: string, en: string } }};
+}
+
+const { currentBook } = Astro.props;
+
+---
+<header class="bg-rosewater text-gray-800 shadow-md">
+  <div class="mx-auto flex justify-between items-center py-4 px-6">
+    <!-- Left Section: Current Book Name -->
+    <div>
+      <h1 id="current-book" class="text-xl font-bold text-gray-800">
+        <BengaliText generateTransliteration={false}>
+          {(currentBook && currentBook.data.title.bn) || "শ্রীশ্রীরামকৃষ্ণ-কথামৃত"}
+        </BengaliText>
+        <Transliteration>
+          {(currentBook && currentBook.data.title.en) || "Sri Sri Ramakrishna Books"}
+        </Transliteration>
+      </h1>
+    </div>
+
+    <!-- Right Section: Theme Selector, Language Selector, Links -->
+    <div class="flex items-center gap-3">
+      <!-- Theme Switcher -->
+      <ThemeSwitcher />
+
+      <!-- Language Selector -->
+      <div
+        class="relative text-left"
+        x-data="{
+          open: false,
+          languages: [
+            { code: 'en', name: 'English' },
+            { code: 'bn', name: 'বাংলা' }
+          ],
+          toggle() {
+            this.open = !this.open;
+          },
+        }"
+        x-id="['language-selector']"
+      >
+        <button
+          @click="toggle"
+          class="inline-flex items-center px-3 py-1 md:py-2 text-sm font-semibold text-inactive-foreground hover:text-active-foreground transition-colors bg-transparent focus:outline-none"
+        >
+          <span x-text="$store.language.current === 'en' ? 'English' : 'বাংলা'"></span>
+        </button>
+        <div
+          x-show="open"
+          class="absolute right-0 z-10 mt-2 w-36 text-text origin-top-right rounded-md bg-crust shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+          x-transition
+        >
+          <ul>
+            <template x-for="language in languages" :key="language.code">
+              <li>
+                <button
+                  @click="$store.language.setLanguage(language.code); open = false"
+                  class="px-4 py-2 text-sm w-full text-left hover:bg-surface0 rounded-md"
+                >
+                  <span x-text="language.name"></span>
+                </button>
+              </li>
+            </template>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Links (e.g., GitHub) -->
+      <div>
+        <a
+          href="https://github.com/debjitbis08/ramakrishna-books"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-inactive-foreground hover:text-active-foreground transition-colors"
+        >
+          <GitHubIcon size={16} />
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+

@@ -1,0 +1,148 @@
+---
+import Sanscript from '@indic-transliteration/sanscript';
+import { JSDOM } from 'jsdom';
+
+const {class: className = '', generateTransliteration = true, ...rest} = Astro.props;
+
+const options = {
+    preferred_alternates: {
+        itrans: {
+            // Vowels
+            "A": "a",
+            "I": "i",
+            "U": "u",
+            "e": "e",
+            "ai": "ai",
+            "o": "o",
+            "au": "au",
+
+            // Consonants
+            "k": "k",
+            "kh": "kh",
+            "g": "g",
+            "gh": "gh",
+            "ng": "ng",
+            "ch": "ch",
+            "chh": "ch",
+            "j": "j",
+            "jh": "jh",
+            "ny": "ny",
+            "t": "t",
+            "th": "th",
+            "d": "d",
+            "dh": "dh",
+            "n": "n",
+            "p": "p",
+            "ph": "ph",
+            "b": "b",
+            "bh": "bh",
+            "m": "m",
+            "r": "r",
+            "RR": "r",
+            "R": "r",
+            "l": "l",
+            "Sh": "sh",
+            "sh": "sh",
+            "N": "n",
+            "s": "s",
+            "h": "h",
+            "Ch": "ch",
+            "v": "b",
+            "Y": "y",
+            "Th": "th",
+            ".D": "r",
+            ".n": "",
+
+            // Nasals and Yogavaahas
+            "M": "n",   // Anusvara
+            "~n": "n",  // Chandrabindu
+            "H": "",    // Visarga (remove it)
+
+            // Special Characters
+            "j~n": "ny",
+            "kSh": "ksh",
+            "gY": "gy",
+
+            "ৎ": "ts", // Transliterate 'ৎ' to 'ts'
+            "ছ": "ch",
+
+            // Numbers
+            "0": "0",
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5",
+            "6": "6",
+            "7": "7",
+            "8": "8",
+            "9": "9",
+
+            // Punctuation
+            "||": ".",  // Double danda
+            "|": ".",   // Single danda
+        }
+    }, syncope: true,  // Drop schwa (e.g., ajaya → ajay)
+};
+
+// Extract and transliterate the content inside <slot />
+const content = await Astro.slots.render('default');
+const transliteration = Sanscript.t(content, "bengali", "itrans", options);
+---
+
+<span
+    x-data="{
+        showBengali: $store.language.current === 'bn',
+        showTransliteration: $store.language.current === 'en',
+        init() {
+          // Watch for global state changes and reset local state
+          this.$watch('$store.language.current', (newLang) => {
+            this.showBengali = newLang === 'bn';
+            this.showTransliteration = newLang === 'en';
+          });
+        },
+      }"
+    class={`relative ${generateTransliteration ? "block hover:bg-surface0" : ""} group rounded-sm rounded-tr-none leading-relaxed ${className}`}
+    :class={`showBengali || showTransliteration ? '${generateTransliteration ? "p-2" : ""}' : ''`}>
+    <!-- Local toggle buttons -->
+    {generateTransliteration && (
+            <span class="hidden group-hover:flex justify-end mb-2 absolute -top-4 left-0 bg-surface0 rounded-t-sm text-text font-normal">
+                <button
+                        @click="showBengali = !showBengali"
+                        :class="{ 'text-bold underline': showBengali }"
+                        class="px-2 py-1 text-sm"
+                        x-show="$store.language.current === 'en'"
+                >
+                    বাংলা
+                </button>
+                <button
+                        @click="showTransliteration = !showTransliteration"
+                        :class="{ 'text-bold underline': showTransliteration }"
+                        class="px-2 py-1 text-sm"
+                        x-show="$store.language.current === 'bn'"
+                >
+                    Transliteration
+                </button>
+            </span>
+
+    )}
+
+    <!-- Render Bengali text if the language is set to Bengali -->
+    <span
+            class={`${generateTransliteration ? "block hover:bg-surface0" : ""} bengali-text text-bengali-light dark:text-bengali-dark`}
+            :class="showBengali && showTransliteration ? 'mb-3' : ''"
+            {...rest}
+            x-show="$store.language.current === 'bn' || showBengali"
+    >
+        <Fragment set:html={content} />
+  </span>
+
+    {generateTransliteration && (<!-- Render transliteration if the language is set to English -->
+            <span
+                    class={`block transliteration-text text-transliteration-light dark:text-transliteration-dark ${className}`}
+                    {...rest}
+                    x-show="$store.language.current === 'en' || showTransliteration"
+            >
+                <Fragment set:html={transliteration} />
+  </span>)}
+</span>

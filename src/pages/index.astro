@@ -1,11 +1,53 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Layout from "../layouts/Layout.astro";
+import BengaliText from "../components/BengaliText.astro";
+import Transliteration from "../components/Transliteration.astro";
+import Header from '../components/Header.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const books = await getCollection('books', ({ data }) => data.type === "book");
+
+console.log("books", (await getCollection('books')).map(book => book.data))
 ---
 
 <Layout>
-	<Welcome />
+    <Header />
+    <main class="py-4 px-4">
+      <h1>All Books</h1>
+      <ul>
+        {books.map((book) => (
+          <li>
+            <a href={`/books/${book.slug}/`.replace(/metadata\//, '')}>
+              <div class="flex items-start gap-4">
+                <div class="w-64 h-64">
+                  <Image src={book.data.cover} alt={book.data.title.en}/>
+                </div>
+                <div>
+                  <p class="text-2xl hover:text-lavender font-bold">
+                    <BengaliText>
+                      {book.data.title.bn}
+                    </BengaliText>
+                    <Transliteration>
+                      {book.data.title.en}
+                    </Transliteration>
+                  </p>
+                  {book.data.description && (
+
+                  <p>
+                    <BengaliText>
+                      {book.data.description.bn}
+                    </BengaliText>
+                    <Transliteration>
+                      {book.data.description.en}
+                    </Transliteration>
+                  </p>
+                  )}
+                </div>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </main>
 </Layout>

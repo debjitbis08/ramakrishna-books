@@ -1,0 +1,36 @@
+---
+import BengaliText from "./BengaliText.astro";
+import MusicNoteIcon from "../assets/icons/music-note.svg";
+import YouTubeIcon from "../assets/icons/youtube.svg";
+
+const { class: className = "", ...rest } = Astro.props;
+
+const content = await Astro.slots.render("default");
+const cleanedContent = content
+    .replace("<p>", "")
+    .replace("</p>", "")
+    .trim()
+    .split("\n")
+
+const processedContent = cleanedContent
+    .map(s => s.trim())
+    .filter(s => s !== "" && s !== "\n")
+    .map((line) => (
+        `<p>${line}</p>`
+    ))
+---
+
+
+<div class="song flex items-start gap-1 italic font-semibold">
+    <div class="pt-6 flex flex-col gap-4">
+        <span class="text-mauve"><MusicNoteIcon size={16}/></span>
+        <span class="text-red">
+            <a href={`https://www.youtube.com/results?search_query=${cleanedContent[0]}`} class="text-xs" title="Search Song on YouTube" target="_blank">
+                <YouTubeIcon size={16}/>
+            </a>
+        </span>
+    </div>
+    <BengaliText class={`${className}`} {...rest}>
+        <Fragment set:html={processedContent} />
+    </BengaliText>
+</div>

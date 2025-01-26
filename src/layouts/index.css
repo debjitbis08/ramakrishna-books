@@ -1,0 +1,106 @@
+@tailwind components;
+@tailwind base;
+
+@layer base {
+  :root {
+    --inverted-text: var(--ctp-base);
+
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --inverted-text: var(--ctp-crust);
+    }
+    .mocha {
+      --inverted-text: var(--ctp-crust);
+    }
+  }
+}
+
+.chapter-content h3 {
+  @apply mb-2 font-bold text-xl text-center;
+}
+
+.chapter-content h4 {
+  @apply mt-4 mb-2 font-bold text-lg text-center;
+}
+
+.chapter-content .summary {
+  @apply italic;
+}
+
+.chapter-content .transliteration-text {
+  @apply my-2 tracking-wide leading-loose;
+  /*font-family: "Libre Baskerville", serif;*/
+  font-family: "Lora", sans-serif;
+}
+
+.chapter-content .bengali-text {
+  font-family: "Noto Serif Bengali", sans-serif;
+}
+
+.chapter-content .meaning {
+  @apply border-b border-overlay0 border-dashed cursor-help;
+}
+
+.chapter-content .footnotes {
+  @apply border-t border-t-surface1 pt-4;
+}
+
+.chapter-content .footnotes #footnote-label {
+  @apply text-lg font-bold hidden;
+}
+
+.chapter-content .footnotes .footnote-content {
+  @apply float-left py-0;
+}
+
+.chapter-content .footnotes ol {
+  @apply list-decimal pl-4;
+}
+
+.chapter-content .footnotes li {
+  @apply py-2;
+}
+
+.chapter-content .rk-quote {
+  @apply text-maroon;
+}
+
+.chapter-content .song p {
+  @apply m-0 mb-2;
+}
+
+.chapter-content .bengali-text p,
+.chapter-content .transliteration-text p {
+  @apply m-0.5;
+}

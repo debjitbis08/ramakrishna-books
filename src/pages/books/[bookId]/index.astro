@@ -1,0 +1,86 @@
+---
+import {getCollection, getEntry} from 'astro:content';
+import Layout from "../../../layouts/Layout.astro";
+import Header from "../../../components/Header.astro";
+import BengaliText from "../../../components/BengaliText.astro";
+import Transliteration from "../../../components/Transliteration.astro";
+
+// Define `getStaticPaths` to generate all paths for `bookId`
+export async function getStaticPaths() {
+  const books = await getCollection('books', ({ data }) => data.type === "book");
+
+  const paths = books.map((book) => ({
+    params: { bookId: book.slug }, // Use `slug` as `bookId`
+  }));
+
+  return paths;
+}
+
+
+// Get the dynamic `bookId` from the URL
+const { bookId } = Astro.params;
+
+const book = await getEntry("books", `${bookId}`)
+
+if (!book) {
+  // Handle Error, for example:
+  throw new Error('Could not find book');
+}
+
+// Fetch chapters for the specific book
+const sections = await getCollection('books', ({ data,slug }) =>
+  data.type !== 'book' && slug.startsWith(bookId)
+);
+
+const groupedSections = Object.values(sections.reduce((grouped, section) => {
+  if (grouped[section.data.chapter]) {
+    grouped[section.data.chapter].sections = grouped[section.data.chapter].sections.concat([section]);
+    return grouped;
+  } else return {
+    ...grouped,
+    [section.data.chapter]: {
+      chapter: section.data.chapter,
+      chapterTitle: section.data.chapterTitle,
+      sections: [section]
+    }
+  };
+}, {}));
+
+// console.log("sections", groupedSections.map((sections) => sections.sections.map((section) => section.data)));
+---
+
+<Layout>
+  <Header currentBook={book}/>
+  <main class="p-4 container mx-auto">
+    <h2 class="text-2xl text-lavender">Contents</h2>
+    <ol class="mt-4 list-decimal">
+      {groupedSections
+          .sort((a, b) => a.chapter - b.chapter) // Sort chapters by number
+          .map((chapter) => (
+              <li class="mb-4">
+                <div>
+                  {chapter.chapterTitle && (
+                      <BengaliText generateTransliteration={false}>{chapter.chapterTitle.bn}</BengaliText>
+                      <Transliteration>{chapter.chapterTitle.en}</Transliteration>
+                  )}
+                </div>
+                <ol class="pl-4 list-decimal">
+                  {chapter.sections
+                      .sort((a, b) => a.data.order - b.data.order)
+                      .map((section) => (
+                          <li class="py-2">
+                            <a href={`/books/${section.slug}`} class="hover:text-lavender">
+                              {section.data.sectionTitle && (
+                                  <BengaliText generateTransliteration={false}>{section.data.sectionTitle.bn}</BengaliText>
+                                  <Transliteration>{section.data.sectionTitle.en}</Transliteration>
+                              )}
+                            </a>
+                          </li>
+                      ))
+                  }
+                </ol>
+              </li>
+          ))}
+    </ol>
+  </main>
+</Layout>

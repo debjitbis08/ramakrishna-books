@@ -1,0 +1,102 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import Layout from "../../../layouts/Layout.astro";
+import Header from "../../../components/Header.astro";
+import BengaliText from '../../../components/BengaliText.astro';
+import Transliteration from '../../../components/Transliteration.astro';
+
+// Define `getStaticPaths` to generate paths for specific sections
+export async function getStaticPaths() {
+  // Fetch all chapters, frontmatter, and backmatter
+  const sections = await getCollection('books', ({ data }) =>
+    data.type === 'chapter' || data.type === 'frontmatter' || data.type === 'backmatter'
+  );
+
+  const paths = sections.map((section) => ({
+    params: {
+bookId: section.slug.split("/")[0], // Use the book ID
+      sectionId: section.slug.split("/").slice(1).join("/"), // Use the section slug
+    },
+  }));
+
+  return paths;
+}
+
+const { bookId, sectionId } = Astro.params;
+
+const book = await getEntry("books", `${bookId}`)
+
+if (!book) {
+  // Handle Error, for example:
+  throw new Error('Could not find book');
+}
+
+// Fetch the specific section by slug
+const section = await getEntry("books", `${bookId}/${sectionId}`)
+
+if (!section) {
+  // Handle Error, for example:
+  throw new Error('Could not find blog post 1');
+}
+const { Content, headings } = await render(section);
+
+---
+
+<Layout>
+  <Header currentBook={book}/>
+  <main class="chapter-main p-4 max-w-5xl mx-auto">
+
+    {section.data.chapterTitle && (
+        <h2 class="text-2xl font-bold text-text mb-2 p-2 items-start gap-2 text-center">
+          <div class="text-xl text-text mb-1">
+            {section.data.type === "chapter" && `Chapter ${section.data.chapter}`}
+          </div>
+          <div>
+            <BengaliText generateTransliteration={false}>{section.data.chapterTitle.bn}</BengaliText>
+            <Transliteration>{section.data.chapterTitle.en}</Transliteration>
+          </div>
+        </h2>
+    )}
+
+    {section.data.date && (
+        <p class="text-center">
+          <BengaliText generateTransliteration={false}>{section.data.date.bn}</BengaliText>
+          <Transliteration>{section.data.date.en}</Transliteration>
+        </p>
+    )}
+
+    {section.data.sectionTitle && (
+        <h3 class="text-2xl font-bold text-lavender mb-2 p-2 text-center">
+          <BengaliText generateTransliteration={false}>{section.data.sectionTitle.bn}</BengaliText>
+          <Transliteration>{section.data.sectionTitle.en}</Transliteration>
+        </h3>
+    )}
+
+  {section.data.quote && (
+    <blockquote class="text-center font-serif">
+      <BengaliText>
+        <pre class="text-text font-serif">{section.data.quote.bn.split("\n").map(s => s.trim()).join("\n")}</pre>
+      </BengaliText>
+      {section.data.quote.source && (
+          <footer>
+            <cite>
+              <BengaliText generateTransliteration={typeof section.data.quote.source.en === "undefined"}>{section.data.quote.source.bn}</BengaliText>
+              {section.data.quote.source.en && (
+                  <Transliteration>{section.data.quote.source.en}</Transliteration>
+              )}
+            </cite>
+          </footer>
+      )}
+    </blockquote>
+  )}
+
+  <article class="chapter-content"> <Content /> </article>
+
+  <footer class="my-4">
+    <a href={`/books/${bookId}/`}>
+      Back to Chapter List
+    </a>
+  </footer>
+  </main>
+</Layout>
+

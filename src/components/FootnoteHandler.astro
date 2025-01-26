@@ -1,0 +1,52 @@
+---
+// State for footnotes
+const footnotes = {};
+let footnoteIndex = 1;
+
+// Function to extract footnotes dynamically
+function extractFootnotes(content) {
+    const referenceRegex = /\[\^(\d+)\]/g; // Matches [^1], [^2], etc.
+    const definitionRegex = /^\[\^(\d+)\]:\s*(.*)$/gm; // Matches [^1]: Definition text
+
+    // Extract footnote definitions
+    let match;
+    while ((match = definitionRegex.exec(content)) !== null) {
+        const [, key, definition] = match;
+        footnotes[key] = definition.trim();
+        content = content.replace(match[0], ''); // Remove the definition from the content
+    }
+
+    // Replace inline references with <sup> tags
+    const processedContent = content.replace(referenceRegex, (match, key) => {
+        if (footnotes[key]) {
+            return `<sup id="ref-${key}"><a href="#footnote-${key}" class="text-blue-500 hover:underline">${key}</a></sup>`;
+        }
+        return match;
+    });
+
+    return processedContent;
+}
+
+// Process the children content
+const content = await Astro.slots.render("default")
+const processedContent = extractFootnotes(content);
+---
+
+<div x-data>
+    <!-- Render processed content -->
+    <div class="content" set:html={processedContent}></div>
+
+    <!-- Render footnotes if any exist -->
+    {Object.keys(footnotes).length > 0 && (
+            <footer class="footnotes mt-4 text-sm text-text">
+                <ol>
+                    {Object.keys(footnotes).map((key) => (
+                            <li id={`footnote-${key}`}>
+                                {key}. {footnotes[key]}{' '}
+                                <a href={`#ref-${key}`} class="text-blue-500 hover:underline">↩</a>
+                            </li>
+                    ))}
+                </ol>
+            </footer>
+    )}
+</div>
