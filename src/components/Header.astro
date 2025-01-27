@@ -1,21 +1,45 @@
 ---
+import {getCollection, getEntry} from 'astro:content';
 import ThemeSwitcher from '../components/ThemeSwitcher.astro';
 import BengaliText from './BengaliText.astro';
 import Transliteration from './Transliteration.astro';
 import GitHubIcon from '../assets/icons/github.svg';
 
 export interface Props {
-  currentBook?: { data: { title: { bn: string, en: string } }};
+  currentBook?: { id: string, data: { title: { bn: string, en: string } }};
 }
 
 const { currentBook } = Astro.props;
 
+let sections, groupedSections;
+
+if (currentBook) {
+  // Fetch chapters for the specific book
+  sections = await getCollection('books', ({ data,slug }) =>
+      data.type !== 'book' && slug.startsWith(currentBook.id)
+  );
+
+  groupedSections = Object.values(sections.reduce((grouped, section) => {
+    if (grouped[section.data.chapter]) {
+      grouped[section.data.chapter].sections = grouped[section.data.chapter].sections.concat([section]);
+      return grouped;
+    } else return {
+      ...grouped,
+      [section.data.chapter]: {
+        chapter: section.data.chapter,
+        chapterTitle: section.data.chapterTitle,
+        sections: [section]
+      }
+    };
+  }, {}));
+}
+
 ---
-<header class="bg-rosewater text-gray-800 shadow-md">
+<header class="shadow-md fixed w-full backdrop-blur bg-crust/50 z-40">
   <div class="mx-auto flex justify-between items-center py-4 px-6">
     <!-- Left Section: Current Book Name -->
     <div>
-      <h1 id="current-book" class="text-xl font-bold text-gray-800">
+      <h1 id="current-book" class="text-xl font-bold">
         <BengaliText generateTransliteration={false}>
           {(currentBook && currentBook.data.title.bn) || "শ্রীশ্রীরামকৃষ্ণ-কথামৃত"}
         </BengaliText>

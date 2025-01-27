@@ -40,11 +40,16 @@ if (!section) {
 }
 const { Content, headings } = await render(section);
 
+const first = (arr) => Array.isArray(arr) && arr.length > 0 ? arr[0] : null
+
+const previousSection = first(section.data.order > 0 ? await getCollection("books", (s) => s.data.order === section.data.order - 1) : null);
+const nextSection = first(await getCollection("books", (s) => s.data.order === section.data.order + 1));
+
 ---
 
 <Layout>
   <Header currentBook={book}/>
-  <main class="chapter-main p-4 max-w-5xl mx-auto">
+  <main class="pt-20 chapter-main p-4 max-w-5xl mx-auto">
 
     {section.data.chapterTitle && (
         <h2 class="text-2xl font-bold text-text mb-2 p-2 items-start gap-2 text-center">
@@ -92,11 +97,22 @@ const { Content, headings } = await render(section);
 
   <article class="chapter-content"> <Content /> </article>
 
-  <footer class="my-4">
-    <a href={`/books/${bookId}/`}>
-      Back to Chapter List
+  <footer class="my-4 flex items-center justify-between">
+    {previousSection && (
+        <a href={`/books/${previousSection.slug}`} class="text-blue-500 hover:underline">
+          ← Previous: {previousSection.data.sectionTitle ? previousSection.data.sectionTitle.en : `Chapter ${previousSection.data.chapter}`}
+        </a>
+    )}
+
+    <a href={`/books/${bookId}/`} class="text-blue-500 hover:underline">
+      Contents
     </a>
-  </footer>
+
+    {nextSection && (
+        <a href={`/books/${nextSection.slug}`} class="text-blue-500 hover:underline">
+          Next: {nextSection.data.sectionTitle ? nextSection.data.sectionTitle.en : `Chapter ${nextSection.data.chapter}`} →
+        </a>
+    )}  </footer>
   </main>
 </Layout>
 
