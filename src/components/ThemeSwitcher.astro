@@ -85,13 +85,13 @@ import ComputerDesktopIcon from '../assets/icons/computer-desktop.svg';
                 >
                   <!-- Dynamically inject icon based on theme -->
                   <template x-if="option.icon === 'sun'">
-            <SunIcon size={16} />
+                    <SunIcon size={16} />
                   </template>
                   <template x-if="option.icon === 'moon'">
-            <MoonIcon size={16} />
+                    <MoonIcon size={16} />
                   </template>
                   <template x-if="option.icon === 'computer-desktop'">
-            <ComputerDesktopIcon size={16} />
+                    <ComputerDesktopIcon size={16} />
                   </template>
                   <div x-text="option.name"></div>
                 </button>

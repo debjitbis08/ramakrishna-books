@@ -78,9 +78,9 @@ const nextSection = first(await getCollection("books", (s) => s.data.order === s
     )}
 
   {section.data.quote && (
-    <blockquote class="text-center font-serif">
+    <blockquote class="text-center font-serif w-full">
       <BengaliText>
-        <pre class="text-text font-serif">{section.data.quote.bn.split("\n").map(s => s.trim()).join("\n")}</pre>
+        {section.data.quote.bn.split("\n").map(s => <p>{s.trim()}</p>)}
       </BengaliText>
       {section.data.quote.source && (
           <footer>
