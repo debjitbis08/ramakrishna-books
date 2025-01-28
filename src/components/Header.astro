@@ -48,10 +48,11 @@ if (currentBook) {
           {(currentBook && currentBook.data.title.en) || "Sri Sri Ramakrishna Books"}
         </Transliteration>
       </h1>
-      <div class="flex justify-center">
-        <div
-            class="relative text-left hidden"
-            x-data="{
+      {currentBook && (
+          <div class="flex justify-center">
+            <div
+                class="relative text-left hidden"
+                x-data="{
                 open: false,
                 init() {
                     this.$el.classList.remove('hidden');
@@ -73,37 +74,38 @@ if (currentBook) {
                     focusAfter && focusAfter.focus()
                 }
             }"
-            x-on:keydown.escape.prevent.stop="close($refs.button)"
-            x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
-            x-id="['contents-dropdown-button']"
-        >
-          <div>
-            <button
-                class="inline-flex justify-center rounded-md px-3 pr-0 py-1 md:py-2 text-sm font-semibold transition-colors bg-transparent focus:outline-none"
-                x-ref="button"
-                x-on:click="toggle()"
-                :aria-expanded="open"
-                :aria-controls="$id('contents-dropdown-button')"
-                type="button"
-            >Contents</button>
+                x-on:keydown.escape.prevent.stop="close($refs.button)"
+                x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
+                x-id="['contents-dropdown-button']"
+            >
+              <div>
+                <button
+                    class="inline-flex justify-center rounded-md px-3 pr-0 py-1 md:py-2 text-sm font-semibold transition-colors bg-transparent focus:outline-none"
+                    x-ref="button"
+                    x-on:click="toggle()"
+                    :aria-expanded="open"
+                    :aria-controls="$id('contents-dropdown-button')"
+                    type="button"
+                >Contents</button>
+              </div>
+              <div
+                  class="absolute left-0 z-10 mt-2 p-4 w-screen md:w-64 origin-top-left rounded-md text-text bg-crust shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="theme-switcher-button"
+                  tabindex="-1"
+                  x-ref="panel"
+                  x-show="open"
+                  x-transition.origin.top.left
+                  x-on:click.outside="close($refs.button)"
+                  :id="$id('dropdown-button')"
+                  style="display: none;"
+              >
+                <Contents book={currentBook} />
+              </div>
+            </div>
           </div>
-          <div
-              class="absolute left-0 z-10 mt-2 p-4 w-screen md:w-64 origin-top-left rounded-md text-text bg-crust shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-              role="menu"
-              aria-orientation="vertical"
-              aria-labelledby="theme-switcher-button"
-              tabindex="-1"
-              x-ref="panel"
-              x-show="open"
-              x-transition.origin.top.left
-              x-on:click.outside="close($refs.button)"
-              :id="$id('dropdown-button')"
-              style="display: none;"
-          >
-            <Contents book={currentBook} />
-          </div>
-        </div>
-      </div>
+      )}
     </div>
 
     <!-- Right Section: Theme Selector, Language Selector, Links -->
