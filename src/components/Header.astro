@@ -40,9 +40,9 @@ if (currentBook) {
   <div class="mx-auto flex justify-between items-center py-4 px-6">
     <!-- Left Section: Current Book Name -->
     <div class="flex items-center gap-2">
-      <h1 id="current-book" class="text-xl font-bold hidden md:block">
+      <h1 id="current-book" class={`text-normal md:text-xl text-text font-bold ${currentBook ? "hidden md:block" : ""}`}>
         <BengaliText generateTransliteration={false}>
-          {(currentBook && currentBook.data.title.bn) || "শ্রীশ্রীরামকৃষ্ণ-কথামৃত"}
+          {(currentBook && currentBook.data.title.bn) || "শ্রীশ্রীরামকৃষ্ণ কথামৃত"}
         </BengaliText>
         <Transliteration>
           {(currentBook && currentBook.data.title.en) || "Sri Sri Ramakrishna Books"}
@@ -89,7 +89,7 @@ if (currentBook) {
                 >Contents</button>
               </div>
               <div
-                  class="absolute left-0 z-10 mt-2 p-4 w-screen md:w-64 origin-top-left rounded-md text-text bg-crust shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                  class="absolute left-0 z-10 mt-2 p-4 w-screen md:w-64 max-h-[80vh] overflow-y-auto origin-top-left rounded-md text-text bg-crust shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                   role="menu"
                   aria-orientation="vertical"
                   aria-labelledby="theme-switcher-button"

@@ -7,25 +7,23 @@ import Transliteration from "../components/Transliteration.astro";
 import Header from '../components/Header.astro';
 
 const books = await getCollection('books', ({ data }) => data.type === "book");
-
-console.log("books", (await getCollection('books')).map(book => book.data))
 ---
 
 <Layout>
     <Header />
-    <main class="py-4 px-4">
-      <h1>All Books</h1>
+    <main class="py-4 px-4 pt-24 container">
+      <h1 class="mb-10 text-lg font-bold poppins-bold">All Books</h1>
       <ul>
         {books.map((book) => (
-          <li>
-            <a href={`/books/${book.slug}/`.replace(/metadata\//, '')}>
-              <div class="flex items-start gap-4">
-                <div class="w-64 h-64">
-                  <Image src={book.data.cover} alt={book.data.title.en}/>
+          <li class="w-full md:w-1/2">
+            <a href={`/books/${book.slug}/`.replace(/metadata\//, '')} class="block">
+              <div class="flex flex-col items-start gap-4">
+                <div class="h-64 w-full sm:h-80 lg:h-96">
+                  <Image src={book.data.cover} alt={book.data.title.en} class="h-64 w-full object-cover object-top sm:h-80 lg:h-96"/>
                 </div>
                 <div>
-                  <p class="text-2xl hover:text-lavender font-bold">
-                    <BengaliText>
+                  <p class="text-2xl text-mauve hover:text-lavender font-bold poppins-extrabold mt-3 mb-2">
+                    <BengaliText generateTransliteration={false}>
                       {book.data.title.bn}
                     </BengaliText>
                     <Transliteration>
@@ -34,8 +32,8 @@ console.log("books", (await getCollection('books')).map(book => book.data))
                   </p>
                   {book.data.description && (
 
-                  <p>
-                    <BengaliText>
+                  <p class="poppins-regular leading-relaxed">
+                    <BengaliText generateTransliteration={false}>
                       {book.data.description.bn}
                     </BengaliText>
                     <Transliteration>

@@ -52,8 +52,8 @@ const nextSection = first(await getCollection("books", (s) => s.data.order === s
   <main class="pt-20 chapter-main p-4 max-w-5xl mx-auto">
 
     {section.data.chapterTitle && (
-        <h2 class="text-2xl font-bold text-text mb-2 p-2 items-start gap-2 text-center">
-          <div class="text-xl text-text mb-1">
+        <h2 class="text-xl font-bold text-surface2 mb-2 p-2 items-start gap-2 text-center poppins-extrabold">
+          <div class="text-xl mb-1">
             {section.data.type === "chapter" && `Chapter ${section.data.chapter}`}
           </div>
           <div>
@@ -64,14 +64,14 @@ const nextSection = first(await getCollection("books", (s) => s.data.order === s
     )}
 
     {section.data.date && (
-        <p class="text-center">
+        <p class="text-center poppins-regular">
           <BengaliText generateTransliteration={false}>{section.data.date.bn}</BengaliText>
           <Transliteration>{section.data.date.en}</Transliteration>
         </p>
     )}
 
     {section.data.sectionTitle && (
-        <h3 class="text-2xl font-bold text-lavender mb-2 p-2 text-center">
+        <h3 class="text-2xl font-bold text-lavender mb-2 p-2 text-center poppins-extrabold">
           <BengaliText generateTransliteration={false}>{section.data.sectionTitle.bn}</BengaliText>
           <Transliteration>{section.data.sectionTitle.en}</Transliteration>
         </h3>
